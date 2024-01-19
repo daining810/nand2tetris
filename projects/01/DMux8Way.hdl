@@ -1,0 +1,63 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/01/DMux8Way.hdl
+/**
+ * 8-way demultiplexor:
+ * [a, b, c, d, e, f, g, h] = [in, 0, 0, 0, 0, 0, 0, 0] if sel == 000
+ *                            [0, in, 0, 0, 0, 0, 0, 0] if sel == 001
+ *                            ...
+ *                            [0, 0, 0, 0, 0, 0, 0, in] if sel == 111
+ */
+CHIP DMux8Way {
+    IN in, sel[3];
+    OUT a, b, c, d, e, f, g, h;
+
+    PARTS:
+    // 利用 DMux4Way 和 DMux4Way
+    DMux4Way(in=in, sel=sel[0..1], a=o0, b=o1, c=o2, d=o3);
+    DMux(in=o0, sel=sel[2], a=a, b=e);
+    DMux(in=o1, sel=sel[2], a=b, b=f);
+    DMux(in=o2, sel=sel[2], a=c, b=g);
+    DMux(in=o3, sel=sel[2], a=d, b=h);
+
+    // 传统实现方式
+    // in sel[2] sel[1] sel[0]  a b c d e f g h
+    // 0  0      0      0       0
+    // 0  0      0      1
+    // 0  0      1      0
+    // 0  0      1      1
+    // 0  1      0      0
+    // 0  1      0      1
+    // 0  1      1      0
+    // 0  1      1      1                     0
+    // 1  0      0      0       1 0 0 0 0 0 0 0  in and not sel[2] and not sel[1] and not sel[0] -> a
+    // 1  0      0      1       0 1 0 0 0 0 0 0  in and not sel[2] and not sel[1] and sel[0] -> b
+    // 1  0      1      0       0 0 1 0 0 0 0 0  in and not sel[2] and sel[1] and not sel[0] -> c
+    // 1  0      1      1       0 0 0 1 0 0 0 0  in and not sel[2] and sel[1] and sel[0] -> d
+    // 1  1      0      0       0 0 0 0 1 0 0 0  in and sel[2] and not sel[1] and not sel[0] -> e
+    // 1  1      0      1       0 0 0 0 0 1 0 0  in and sel[2] and not sel[1] and sel[0] -> f
+    // 1  1      1      0       0 0 0 0 0 0 1 0  in and sel[2] and sel[1] and not sel[0] -> g
+    // 1  1      1      1       0 0 0 0 0 0 0 1  in and sel[2] and sel[1] and sel[0] -> h
+
+    // Not(in=sel[0], out=ns0);
+    // Not(in=sel[1], out=ns1);
+    // Not(in=sel[2], out=ns2);
+    // And(a=in, b=ns2, out=ians2);
+    // And(a=ians2, b=ns1, out=ians2ans1);
+    // And(a=ians2ans1, b=ns0, out=a);
+    // And(a=ians2ans1, b=sel[0], out=b);
+
+    // And(a=ians2, b=sel[1], out=ians2as1);
+    // And(a=ians2as1, b=ns0, out=c);
+    // And(a=ians2as1, b=sel[0], out=d);
+
+    // And(a=in, b=sel[2], out=ias2);
+    // And(a=ias2, b=ns1, out=ias2ans1);
+    // And(a=ias2ans1, b=ns0, out=e);
+    // And(a=ias2ans1, b=sel[0], out=f);
+
+    // And(a=ias2, b=sel[1], out=ias2as1);
+    // And(a=ias2as1, b=ns0, out=g);
+    // And(a=ias2as1, b=sel[0], out=h);
+}

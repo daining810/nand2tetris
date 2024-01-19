@@ -1,0 +1,69 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/02/FullAdder.hdl
+/**
+ * Computes the sum of three bits.
+ */
+CHIP FullAdder {
+    IN a, b, c;  // 1-bit inputs
+    OUT sum,     // Right bit of a + b + c
+        carry;   // Left bit of a + b + c
+
+    PARTS:
+    // a b c  sum carry
+    // 0 0 0  0   0
+    // 0 0 1  1   0
+    // 0 1 0  1   0
+    // 0 1 1  0   1
+    // 1 0 0  1   0
+    // 1 0 1  0   1
+    // 1 1 0  0   1
+    // 1 1 1  1   1
+
+    // sum eq 1
+    // not a and not b and c // mark1
+    // not a and b and not c // mark2
+    // a and not b and not c // mark3
+    // a and b and c // mark4
+
+    // carry eq 1
+    // not a and b and c // mark5
+    // a and not b and c // mark6
+    // a and b and not c // mark7
+    // a and b and c 
+
+    // 使用两个半加器
+    HalfAdder(a=a, b=b, sum=s1, carry=c1); // a + b = s1 
+    HalfAdder(a=s1, b=c, sum=sum, carry=c2); // s1 + c = sum c2
+    Or(a=c1, b=c2, out=carry); // c1 + c2 = carry, 两个进位只要有一个为1就输出, 因为溢出的位被丢弃
+
+    // 使用三个半加器
+    // HalfAdder(a=a, b=b, sum=s1, carry=c1); // a + b = s1
+    // HalfAdder(a=s1, b=c, sum=sum, carry=c2); // s1 + c = sum c2
+    // HalfAdder(a=c1, b=c2, sum=carry); 
+
+    // 常规实现方式
+    // Not(in=a, out=na);
+    // Not(in=b, out=nb);
+    // Not(in=c, out=nc);
+ 
+    // And(a=na, b=nb, out=naanb);
+    // And(a=naanb, b=c, out=naanbac); // mark1
+    // And(a=na, b=b, out=naab);
+    // And(a=naab, b=nc, out=naabanc); // mark2
+    // And(a=a, b=nb, out=aanb);
+    // And(a=aanb, b=nc, out=annbnnc); // mark3
+    // And(a=a, b=b, out=aab); 
+    // And(a=aab, b=c, out=aabac); // mark4
+    // Or(a=naanbac, b=naabanc, out=m1om2);
+    // Or(a=m1om2, b=annbnnc, out=m1om2om3);
+    // Or(a=m1om2om3, b=aabac, out=sum);
+ 
+    // And(a=naab, b=c, out=naabac); // mark5
+    // And(a=aanb, b=c, out=aanbac); // mark6
+    // And(a=aab, b=nc, out=aabanc); // mark7
+    // Or(a=naabac, b=aanbac, out=m5om6);
+    // Or(a=m5om6, b=aabanc, out=m5om6om7);
+    // Or(a=m5om6om7, b=aabac, out=carry); 
+}

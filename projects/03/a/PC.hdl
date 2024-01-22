@@ -18,6 +18,11 @@ CHIP PC {
     OUT out[16];
     
     PARTS:
+    // 按照注释中的流程实现: 计算原始输出 out0 的+1结果记录为 incout
+    // 从 out0 和 incout 中按 inc 选择, 输出结果为 out1
+    // 从 out1 和 in 中按 load 选择, 输出结果为 out2
+    // 从 out2 和 0 中按 reset 选择, 输出结果为 out3
+    // 使用寄存器 Register 将 out3 存储起来, 并且输出 out 和 out0(原始输出)
     Inc16(in=out0, out=incout);
     Mux16(a=out0, b=incout, sel=inc, out=out1);
     Mux16(a=out1, b=in, sel=load, out=out2);

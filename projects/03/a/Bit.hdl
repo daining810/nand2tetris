@@ -13,5 +13,7 @@ CHIP Bit {
     OUT out;
 
     PARTS:
-    //// Replace this comment with your code.
+    // 结合 1-bit register 的工作原理实现
+    Mux(a=o2, b=in, sel=load, out=o1); // 可以使用下面定义的内置针脚, 如o2.
+    DFF(in=o1, out=out, out=o2);
 }
